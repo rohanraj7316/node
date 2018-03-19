@@ -1,13 +1,3 @@
-/******************************************************************************
- * Experimental prototype for demonstrating VM agnostic and ABI stable API
- * for native modules to use instead of using Nan and V8 APIs directly.
- *
- * The current status is "Experimental" and should not be used for
- * production applications.  The API is still subject to change
- * and as an experimental feature is NOT subject to semver.
- *
- ******************************************************************************/
-
 #include <node_buffer.h>
 #include <node_object_wrap.h>
 #include <limits.h>  // INT_MAX
@@ -2811,11 +2801,15 @@ napi_status napi_make_callback(napi_env env,
       isolate, v8recv, v8func, argc,
       reinterpret_cast<v8::Local<v8::Value>*>(const_cast<napi_value*>(argv)),
       *node_async_context);
-  CHECK_MAYBE_EMPTY(env, callback_result, napi_generic_failure);
 
-  if (result != nullptr) {
-    *result = v8impl::JsValueFromV8LocalValue(
-        callback_result.ToLocalChecked());
+  if (try_catch.HasCaught()) {
+    return napi_set_last_error(env, napi_pending_exception);
+  } else {
+    CHECK_MAYBE_EMPTY(env, callback_result, napi_generic_failure);
+    if (result != nullptr) {
+      *result = v8impl::JsValueFromV8LocalValue(
+          callback_result.ToLocalChecked());
+    }
   }
 
   return GET_RETURN_STATUS(env);

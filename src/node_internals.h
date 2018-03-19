@@ -120,6 +120,7 @@ struct sockaddr;
     V(serdes)                                                                 \
     V(signal_wrap)                                                            \
     V(spawn_sync)                                                             \
+    V(stream_pipe)                                                            \
     V(stream_wrap)                                                            \
     V(string_decoder)                                                         \
     V(tcp_wrap)                                                               \
@@ -182,13 +183,13 @@ extern bool config_experimental_vm_modules;
 
 // Set in node.cc by ParseArgs when --loader is used.
 // Used in node_config.cc to set a constant on process.binding('config')
-// that is used by lib/internal/bootstrap_node.js
+// that is used by lib/internal/bootstrap/node.js
 extern std::string config_userland_loader;
 
 // Set in node.cc by ParseArgs when --expose-internals or --expose_internals is
 // used.
 // Used in node_config.cc to set a constant on process.binding('config')
-// that is used by lib/internal/bootstrap_node.js
+// that is used by lib/internal/bootstrap/node.js
 extern bool config_expose_internals;
 
 // Set in node.cc by ParseArgs when --redirect-warnings= is used.
@@ -775,6 +776,15 @@ static inline const char *errno_string(int errorno) {
 
 #define NODE_MODULE_CONTEXT_AWARE_INTERNAL(modname, regfunc)                  \
   NODE_MODULE_CONTEXT_AWARE_CPP(modname, regfunc, nullptr, NM_F_INTERNAL)
+
+#define TRACING_CATEGORY_NODE "node"
+#define TRACING_CATEGORY_NODE1(one)                                           \
+    TRACING_CATEGORY_NODE ","                                                 \
+    TRACING_CATEGORY_NODE "." #one
+#define TRACING_CATEGORY_NODE2(one, two)                                      \
+    TRACING_CATEGORY_NODE ","                                                 \
+    TRACING_CATEGORY_NODE "." #one ","                                        \
+    TRACING_CATEGORY_NODE "." #one "." #two
 
 }  // namespace node
 

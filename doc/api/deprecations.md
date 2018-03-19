@@ -560,16 +560,16 @@ The `tls.createSecurePair()` API was deprecated in documentation in Node.js
 <a id="DEP0065"></a>
 ### DEP0065: repl.REPL_MODE_MAGIC and NODE_REPL_MODE=magic
 
-Type: Documentation-only
+Type: End-of-Life
 
 The `repl` module's `REPL_MODE_MAGIC` constant, used for `replMode` option, has
-been deprecated. Its behavior has been functionally identical to that of
+been removed. Its behavior has been functionally identical to that of
 `REPL_MODE_SLOPPY` since Node.js v6.0.0, when V8 5.0 was imported. Please use
 `REPL_MODE_SLOPPY` instead.
 
 The `NODE_REPL_MODE` environment variable is used to set the underlying
-`replMode` of an interactive `node` session. Its default value, `magic`, is
-similarly deprecated in favor of `sloppy`.
+`replMode` of an interactive `node` session. Its value, `magic`, is also
+removed. Please use `sloppy` instead.
 
 <a id="DEP0066"></a>
 ### DEP0066: outgoingMessage.\_headers, outgoingMessage.\_headerNames
@@ -915,7 +915,6 @@ Type: Runtime
 
 This was never a documented feature.
 
-
 <a id="DEP0101"></a>
 ### DEP0101: --with-lttng
 
@@ -940,6 +939,26 @@ Type: Documentation-only (supports [`--pending-deprecation`][])
 Using `process.binding()` in general should be avoided. The type checking
 methods in particular can be replaced by using [`util.types`][].
 
+<a id="DEP0104"></a>
+### DEP0104: process.env string coercion
+
+Type: Documentation-only (supports [`--pending-deprecation`][])
+
+Currently when assigning a property to [`process.env`][], the assigned value is
+implicitly converted to a string if it is not a string. This behavior is
+deprecated if the assigned value is not a string, boolean, or number. In the
+future, such assignment may result in a thrown error. Please convert the
+property to a string before assigning it to `process.env`.
+
+<a id="DEP0105"></a>
+### DEP0105: decipher.finaltol
+
+Type: Runtime
+
+`decipher.finaltol()` has never been documented and is currently an alias for
+[`decipher.final()`][]. In the future, this API will likely be removed, and it
+is recommended to use [`decipher.final()`][] instead.
+
 [`--pending-deprecation`]: cli.html#cli_pending_deprecation
 [`Buffer.allocUnsafeSlow(size)`]: buffer.html#buffer_class_method_buffer_allocunsafeslow_size
 [`Buffer.from(array)`]: buffer.html#buffer_class_method_buffer_from_array
@@ -961,6 +980,7 @@ methods in particular can be replaced by using [`util.types`][].
 [`crypto.DEFAULT_ENCODING`]: crypto.html#crypto_crypto_default_encoding
 [`crypto.fips`]: crypto.html#crypto_crypto_fips
 [`crypto.pbkdf2()`]: crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback
+[`decipher.final()`]: crypto.html#crypto_decipher_final_outputencoding
 [`decipher.setAuthTag()`]: crypto.html#crypto_decipher_setauthtag_buffer
 [`domain`]: domain.html
 [`ecdh.setPublicKey()`]: crypto.html#crypto_ecdh_setpublickey_publickey_encoding
@@ -976,6 +996,7 @@ methods in particular can be replaced by using [`util.types`][].
 [`fs.stat()`]: fs.html#fs_fs_stat_path_callback
 [`os.networkInterfaces`]: os.html#os_os_networkinterfaces
 [`os.tmpdir()`]: os.html#os_os_tmpdir
+[`process.env`]: process.html#process_process_env
 [`punycode`]: punycode.html
 [`require.extensions`]: modules.html#modules_require_extensions
 [`setInterval()`]: timers.html#timers_setinterval_callback_delay_args

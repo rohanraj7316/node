@@ -295,8 +295,6 @@ For more information about the governance of the Node.js project, see
 
 ### Collaborators
 
-* [abouthiroppy](https://github.com/abouthiroppy) -
-**Yuta Hiroto** &lt;hello@about-hiroppy.com&gt; (he/him)
 * [addaleax](https://github.com/addaleax) -
 **Anna Henningsen** &lt;anna@addaleax.net&gt; (she/her)
 * [ak239](https://github.com/ak239) -
@@ -371,6 +369,8 @@ For more information about the governance of the Node.js project, see
 **Guy Bedford** &lt;guybedford@gmail.com&gt; (he/him)
 * [hashseed](https://github.com/hashseed) -
 **Yang Guo** &lt;yangguo@chromium.org&gt; (he/him)
+* [hiroppy](https://github.com/hiroppy) -
+**Yuta Hiroto** &lt;hello@hiroppy.me&gt; (he/him)
 * [iarna](https://github.com/iarna) -
 **Rebecca Turner** &lt;me@re-becca.org&gt;
 * [imran-iq](https://github.com/imran-iq) -
@@ -513,6 +513,8 @@ For more information about the governance of the Node.js project, see
 **Vse Mozhet Byt** &lt;vsemozhetbyt@gmail.com&gt; (he/him)
 * [watilde](https://github.com/watilde) -
 **Daijiro Wachi** &lt;daijiro.wachi@gmail.com&gt; (he/him)
+* [watson](https://github.com/watson) -
+**Thomas Watson** &lt;w@tson.dk&gt;
 * [whitlockjc](https://github.com/whitlockjc) -
 **Jeremy Whitlock** &lt;jwhitlock@apache.org&gt;
 * [XadillaX](https://github.com/XadillaX) -

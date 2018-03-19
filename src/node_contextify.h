@@ -4,16 +4,13 @@
 #include "node_internals.h"
 #include "node_watchdog.h"
 #include "base_object-inl.h"
+#include "node_context_data.h"
 
 namespace node {
 namespace contextify {
 
 class ContextifyContext {
  protected:
-  // V8 reserves the first field in context objects for the debugger. We use the
-  // second field to hold a reference to the sandbox object.
-  enum { kSandboxObjectIndex = 1 };
-
   Environment* const env_;
   Persistent<v8::Context> context_;
 
@@ -26,6 +23,9 @@ class ContextifyContext {
   v8::Local<v8::Context> CreateV8Context(Environment* env,
       v8::Local<v8::Object> sandbox_obj, v8::Local<v8::Object> options_obj);
   static void Init(Environment* env, v8::Local<v8::Object> target);
+
+  static bool AllowWasmCodeGeneration(
+      v8::Local<v8::Context> context, v8::Local<v8::String>);
 
   static ContextifyContext* ContextFromContextifiedSandbox(
       Environment* env,
@@ -45,7 +45,7 @@ class ContextifyContext {
 
   inline v8::Local<v8::Object> sandbox() const {
     return v8::Local<v8::Object>::Cast(
-        context()->GetEmbedderData(kSandboxObjectIndex));
+        context()->GetEmbedderData(ContextEmbedderIndex::kSandboxObject));
   }
 
  private:

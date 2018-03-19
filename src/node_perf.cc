@@ -40,6 +40,15 @@ uint64_t performance_v8_start;
 uint64_t performance_last_gc_start_mark_ = 0;
 v8::GCType performance_last_gc_type_ = v8::GCType::kGCTypeAll;
 
+void performance_state::Mark(enum PerformanceMilestone milestone,
+                             uint64_t ts) {
+  this->milestones[milestone] = ts;
+  TRACE_EVENT_INSTANT_WITH_TIMESTAMP0(
+      TRACING_CATEGORY_NODE1(bootstrap),
+      GetPerformanceMilestoneName(milestone),
+      TRACE_EVENT_SCOPE_THREAD, ts);
+}
+
 double GetCurrentTimeInMicroseconds() {
 #ifdef _WIN32
 // The difference between the Unix Epoch and the Windows Epoch in 100-ns ticks.
@@ -135,7 +144,8 @@ void Mark(const FunctionCallbackInfo<Value>& args) {
   (*marks)[*name] = now;
 
   TRACE_EVENT_COPY_MARK_WITH_TIMESTAMP(
-      "node.perf,node.perf.usertiming", *name, now / 1000);
+      TRACING_CATEGORY_NODE2(perf, usertiming),
+      *name, now / 1000);
 
   PerformanceEntry entry(env, *name, "mark", now, now);
   Local<Object> obj = entry.ToObject();
@@ -183,9 +193,11 @@ void Measure(const FunctionCallbackInfo<Value>& args) {
     endTimestamp = startTimestamp;
 
   TRACE_EVENT_COPY_NESTABLE_ASYNC_BEGIN_WITH_TIMESTAMP0(
-      "node.perf,node.perf.usertiming", *name, *name, startTimestamp / 1000);
+      TRACING_CATEGORY_NODE2(perf, usertiming),
+      *name, *name, startTimestamp / 1000);
   TRACE_EVENT_COPY_NESTABLE_ASYNC_END_WITH_TIMESTAMP0(
-      "node.perf,node.perf.usertiming", *name, *name, endTimestamp / 1000);
+      TRACING_CATEGORY_NODE2(perf, usertiming),
+      *name, *name, endTimestamp / 1000);
 
   PerformanceEntry entry(env, *name, "measure", startTimestamp, endTimestamp);
   Local<Object> obj = entry.ToObject();
@@ -197,14 +209,11 @@ void Measure(const FunctionCallbackInfo<Value>& args) {
 void MarkMilestone(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
   Local<Context> context = env->context();
-  AliasedBuffer<double, v8::Float64Array>& milestones =
-      env->performance_state()->milestones;
   PerformanceMilestone milestone =
       static_cast<PerformanceMilestone>(
           args[0]->Int32Value(context).ToChecked());
-  if (milestone != NODE_PERFORMANCE_MILESTONE_INVALID) {
-    milestones[milestone] = PERFORMANCE_NOW();
-  }
+  if (milestone != NODE_PERFORMANCE_MILESTONE_INVALID)
+    env->performance_state()->Mark(milestone);
 }
 
 
@@ -301,13 +310,15 @@ void TimerFunctionCall(const FunctionCallbackInfo<Value>& args) {
   if (args.IsConstructCall()) {
     start = PERFORMANCE_NOW();
     TRACE_EVENT_COPY_NESTABLE_ASYNC_BEGIN_WITH_TIMESTAMP0(
-        "node.perf,node.perf.timerify", *name, *name, start / 1000);
+        TRACING_CATEGORY_NODE2(perf, timerify),
+        *name, *name, start / 1000);
     v8::MaybeLocal<Object> ret = fn->NewInstance(context,
                                                  call_args.size(),
                                                  call_args.data());
     end = PERFORMANCE_NOW();
     TRACE_EVENT_COPY_NESTABLE_ASYNC_END_WITH_TIMESTAMP0(
-        "node.perf,node.perf.timerify", *name, *name, end / 1000);
+        TRACING_CATEGORY_NODE2(perf, timerify),
+        *name, *name, end / 1000);
 
     if (ret.IsEmpty()) {
       try_catch.ReThrow();
@@ -317,14 +328,16 @@ void TimerFunctionCall(const FunctionCallbackInfo<Value>& args) {
   } else {
     start = PERFORMANCE_NOW();
     TRACE_EVENT_COPY_NESTABLE_ASYNC_BEGIN_WITH_TIMESTAMP0(
-        "node.perf,node.perf.timerify", *name, *name, start / 1000);
+        TRACING_CATEGORY_NODE2(perf, timerify),
+        *name, *name, start / 1000);
     v8::MaybeLocal<Value> ret = fn->Call(context,
                                          args.This(),
                                          call_args.size(),
                                          call_args.data());
     end = PERFORMANCE_NOW();
     TRACE_EVENT_COPY_NESTABLE_ASYNC_END_WITH_TIMESTAMP0(
-        "node.perf,node.perf.timerify", *name, *name, end / 1000);
+        TRACING_CATEGORY_NODE2(perf, timerify),
+        *name, *name, end / 1000);
 
     if (ret.IsEmpty()) {
       try_catch.ReThrow();

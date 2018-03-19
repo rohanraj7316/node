@@ -50,28 +50,25 @@ If you cannot find who to cc for a file, `git shortlog -n -s <file>` may help.
 
 ## Labels
 
-### By Subsystem
+### Subsystems
 
-We generally sort issues by a concept of "subsystem" so that we know what
-part(s) of the codebase it touches.
+* `lib/*.js` (`assert`, `buffer`, etc.)
+* `build`
+* `doc`
+* `lib / src`
+* `test`
+* `tools`
 
-**Subsystems generally are**:
-
-* `lib/*.js`
-* `doc`, `build`, `tools`, `test`, `deps`, `lib / src` (special), and there may
-  be others.
-* `meta` for anything non-code (process) related
-
-There may be more than one subsystem valid for any particular issue / PR.
+There may be more than one subsystem valid for any particular issue or pull
+request.
 
 ### General
-
-Please use these when possible / appropriate
 
 * `confirmed-bug` - Bugs you have verified exist
 * `discuss` - Things that need larger discussion
 * `feature request` - Any issue that requests a new feature (usually not PRs)
 * `good first issue` - Issues suitable for newcomers to process
+* `meta` - For issues whose topic is governance, policies, procedures, etc.
 
 --
 
@@ -145,10 +142,7 @@ to update from nodejs/node:
 * `git remote update -p` OR `git fetch --all` (I prefer the former)
 * `git merge --ff-only upstream/master` (or `REMOTENAME/BRANCH`)
 
-## best practices
+## Best practices
 
-* commit often, out to your github fork (origin), open a PR
-* when making PRs make sure to spend time on the description:
-  * every moment you spend writing a good description quarters the amount of
-    time it takes to understand your code.
-* usually prefer to only squash at the *end* of your work, depends on the change
+* When making PRs, spend time writing a thorough description.
+* Usually only squash at the end of your work.

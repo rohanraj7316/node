@@ -21,10 +21,10 @@ The `stream` module can be accessed using:
 const stream = require('stream');
 ```
 
-While it is important for all Node.js users to understand how streams work,
-the `stream` module itself is most useful for developers that are creating new
-types of stream instances. Developers who are primarily *consuming* stream
-objects will rarely (if ever) have need to use the `stream` module directly.
+While it is important to understand how streams work, the `stream` module itself
+is most useful for developers that are creating new types of stream instances.
+Developers who are primarily *consuming* stream objects will rarely need to use
+the `stream` module directly.
 
 ## Organization of this Document
 
@@ -860,6 +860,8 @@ added: v0.9.4
 * `destination` {stream.Writable} The destination for writing data
 * `options` {Object} Pipe options
   * `end` {boolean} End the writer when the reader ends. Defaults to `true`.
+* Returns: {stream.Writable} making it possible to set up chains of piped
+  streams
 
 The `readable.pipe()` method attaches a [Writable][] stream to the `readable`,
 causing it to switch automatically into flowing mode and push all of its data
@@ -916,7 +918,9 @@ closed until the Node.js process exits, regardless of the specified options.
 added: v9.3.0
 -->
 
-Return the value of `highWaterMark` passed when constructing this
+* Returns: {number}
+
+Returns the value of `highWaterMark` passed when constructing this
 `Readable`.
 
 ##### readable.read([size])
@@ -925,7 +929,7 @@ added: v0.9.4
 -->
 
 * `size` {number} Optional argument to specify how much data to read.
-* Return {string|Buffer|null}
+* Returns: {string|Buffer|null}
 
 The `readable.read()` method pulls some data out of the internal buffer and
 returns it. If no data available to be read, `null` is returned. By default,
@@ -955,9 +959,6 @@ readable.on('readable', () => {
 });
 ```
 
-Avoid the use of the `'readable'` event and the `readable.read()` method in
-favor of using either `readable.pipe()` or the `'data'` event.
-
 A Readable stream in object mode will always return a single item from
 a call to [`readable.read(size)`][stream-read], regardless of the value of the
 `size` argument.
@@ -972,6 +973,8 @@ been emitted will return `null`. No runtime error will be raised.
 <!-- YAML
 added: v9.4.0
 -->
+
+* Returns: {number}
 
 This property contains the number of bytes (or objects) in the queue
 ready to be read. The value provides introspection data regarding
@@ -1037,6 +1040,7 @@ added: v0.9.4
 -->
 
 * `destination` {stream.Writable} Optional specific stream to unpipe
+* Returns: {this}
 
 The `readable.unpipe()` method detaches a Writable stream previously attached
 using the [`stream.pipe()`][] method.
@@ -1138,6 +1142,7 @@ added: v0.9.4
 -->
 
 * `stream` {Stream} An "old style" readable stream
+* Returns: {this}
 
 Versions of Node.js prior to v0.10 had streams that did not implement the
 entire `stream` module API as it is currently defined. (See [Compatibility][]
@@ -1167,6 +1172,9 @@ myReader.on('readable', () => {
 <!-- YAML
 added: v8.0.0
 -->
+
+* `error` {Error} Error which will be passed as payload in `'error'` event
+* Returns: {this}
 
 Destroy the stream, and emit `'error'` and `close`. After this call, the
 readable stream will release any internal resources and subsequent calls
@@ -1200,7 +1208,10 @@ print(fs.createReadStream('file')).catch(console.log);
 
 If the loop terminates with a `break` or a `throw`, the stream will be
 destroyed. In other terms, iterating over a stream will consume the stream
-fully.
+fully. The stream will be read in chunks of size equal to the `highWaterMark`
+option. In the code example above, data will be in a single chunk if the file
+has less then 64kb of data because no `highWaterMark` option is provided to
+[`fs.createReadStream()`][].
 
 ### Duplex and Transform Streams
 

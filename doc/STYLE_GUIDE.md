@@ -13,12 +13,10 @@
 * American English spelling is preferred. "Capitalize" vs. "Capitalise",
   "color" vs. "colour", etc.
 * Use [serial commas][].
-* Generally avoid personal pronouns in reference documentation ("I", "you",
-  "we").
-  * Pronouns are acceptable in more colloquial documentation, like guides.
-  * Use gender-neutral pronouns and mass nouns. Non-comprehensive
-    examples:
-    * OK: "they", "their", "them", "folks", "people", "developers", "cats"
+* Avoid personal pronouns in reference documentation ("I", "you", "we").
+  * Personal pronouns are acceptable in colloquial documentation such as guides.
+  * Use gender-neutral pronouns and gender-neutral plural nouns.
+    * OK: "they", "their", "them", "folks", "people", "developers"
     * NOT OK: "his", "hers", "him", "her", "guys", "dudes"
 * When combining wrapping elements (parentheses and quotes), terminal
   punctuation should be placed:

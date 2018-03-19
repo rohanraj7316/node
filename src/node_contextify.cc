@@ -23,6 +23,7 @@
 #include "node_watchdog.h"
 #include "base_object-inl.h"
 #include "node_contextify.h"
+#include "node_context_data.h"
 
 namespace node {
 namespace contextify {
@@ -173,7 +174,7 @@ Local<Context> ContextifyContext::CreateV8Context(
   // embedder data field. However, we cannot hold a reference to a v8::Context
   // directly in an Object, we instead hold onto the new context's global
   // object instead (which then has a reference to the context).
-  ctx->SetEmbedderData(kSandboxObjectIndex, sandbox_obj);
+  ctx->SetEmbedderData(ContextEmbedderIndex::kSandboxObject, sandbox_obj);
   sandbox_obj->SetPrivate(env->context(),
                           env->contextify_global_private_symbol(),
                           ctx->Global());
@@ -183,6 +184,30 @@ Local<Context> ContextifyContext::CreateV8Context(
           .ToLocalChecked();
   CHECK(name->IsString());
   Utf8Value name_val(env->isolate(), name);
+
+  Local<Value> codegen = options_obj->Get(env->context(),
+      FIXED_ONE_BYTE_STRING(env->isolate(), "codeGeneration"))
+          .ToLocalChecked();
+
+  if (!codegen->IsUndefined()) {
+    CHECK(codegen->IsObject());
+    Local<Object> codegen_obj = codegen.As<Object>();
+
+    Local<Value> allow_code_gen_from_strings =
+      codegen_obj->Get(env->context(),
+          FIXED_ONE_BYTE_STRING(env->isolate(), "strings"))
+      .ToLocalChecked();
+    ctx->AllowCodeGenerationFromStrings(
+        allow_code_gen_from_strings->IsUndefined() ||
+            allow_code_gen_from_strings->IsTrue());
+
+    Local<Value> allow_wasm_code_gen = codegen_obj->Get(env->context(),
+        FIXED_ONE_BYTE_STRING(env->isolate(), "wasm"))
+      .ToLocalChecked();
+    ctx->SetEmbedderData(ContextEmbedderIndex::kAllowWasmCodeGeneration,
+        Boolean::New(env->isolate(), allow_wasm_code_gen->IsUndefined() ||
+            allow_wasm_code_gen->IsTrue()));
+  }
 
   ContextInfo info(*name_val);
 
@@ -880,8 +905,6 @@ class ContextifyScript : public BaseObject {
 
     if (source.GetCachedData() != nullptr)
       compile_options = ScriptCompiler::kConsumeCodeCache;
-    else if (produce_cached_data)
-      compile_options = ScriptCompiler::kProduceCodeCache;
 
     Context::Scope scope(maybe_context.FromMaybe(env->context()));
 
@@ -903,8 +926,9 @@ class ContextifyScript : public BaseObject {
       args.This()->Set(
           env->cached_data_rejected_string(),
           Boolean::New(env->isolate(), source.GetCachedData()->rejected));
-    } else if (compile_options == ScriptCompiler::kProduceCodeCache) {
-      const ScriptCompiler::CachedData* cached_data = source.GetCachedData();
+    } else if (produce_cached_data) {
+      const ScriptCompiler::CachedData* cached_data =
+        ScriptCompiler::CreateCodeCache(v8_script.ToLocalChecked(), code);
       bool cached_data_produced = cached_data != nullptr;
       if (cached_data_produced) {
         MaybeLocal<Object> buf = Buffer::Copy(

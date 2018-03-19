@@ -65,10 +65,10 @@ for (const testCase of cases) {
       assert.strictEqual(eventType, 'change');
     assert.strictEqual(argFilename, testCase.fileName);
 
-    watcher.start();  // should not crash
-
+    watcher.start();  // starting a started watcher should be a noop
     // end of test case
     watcher.close();
+    watcher.close(); // closing a closed watcher should be a noop
   }));
 
   // long content so it's actually flushed. toUpperCase so there's real change.
@@ -78,3 +78,15 @@ for (const testCase of cases) {
     fs.writeFileSync(testCase.filePath, content2);
   }, 100);
 }
+
+[false, 1, {}, [], null, undefined].forEach((i) => {
+  common.expectsError(
+    () => fs.watch(i, common.mustNotCall()),
+    {
+      code: 'ERR_INVALID_ARG_TYPE',
+      type: TypeError,
+      message: 'The "filename" argument must be one of ' +
+               'type string, Buffer, or URL'
+    }
+  );
+});
