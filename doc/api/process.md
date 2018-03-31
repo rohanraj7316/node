@@ -207,7 +207,7 @@ changes:
     description: Not handling Promise rejections has been deprecated.
   - version: v6.6.0
     pr-url: https://github.com/nodejs/node/pull/8223
-    description: Unhandled Promise rejections have been will now emit
+    description: Unhandled Promise rejections will now emit
                  a process warning.
 -->
 
@@ -468,7 +468,7 @@ Would generate the output:
 
 ## process.argv0
 <!-- YAML
-added: 6.4.0
+added: v6.4.0
 -->
 
 * {string}
@@ -488,6 +488,8 @@ $ bash -c 'exec -a customArgv0 ./node'
 <!-- YAML
 added: v7.1.0
 -->
+
+* {Object}
 
 If the Node.js process was spawned with an IPC channel (see the
 [Child Process][] documentation), the `process.channel`
@@ -692,7 +694,7 @@ module.exports.foo();
 
 ## process.emitWarning(warning[, options])
 <!-- YAML
-added: 8.0.0
+added: v8.0.0
 -->
 
 * `warning` {string|Error} The warning to emit.
@@ -921,7 +923,7 @@ console.log(process.env.test);
 added: v0.7.7
 -->
 
-* {Object}
+* {Array}
 
 The `process.execArgv` property returns the set of Node.js-specific command-line
 options passed when the Node.js process was launched. These options do not
@@ -1250,6 +1252,8 @@ debugger, see [Signal Events][].
 added: v0.1.17
 -->
 
+* {Object}
+
 The `process.mainModule` property provides an alternative way of retrieving
 [`require.main`][]. The difference is that if the main module changes at
 runtime, [`require.main`][] may still refer to the original main module in
@@ -1478,6 +1482,8 @@ changes:
     pr-url: https://github.com/nodejs/node/pull/3212
     description: The `lts` property is now supported.
 -->
+
+* {Object}
 
 The `process.release` property returns an Object containing metadata related to
 the current release, including URLs for the source tarball and headers-only

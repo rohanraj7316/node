@@ -276,10 +276,8 @@ void ContextifyContext::MakeContext(const FunctionCallbackInfo<Value>& args) {
 void ContextifyContext::IsContext(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
 
-  if (!args[0]->IsObject()) {
-    env->ThrowTypeError("sandbox must be an object");
-    return;
-  }
+  CHECK(args[0]->IsObject());
+
   Local<Object> sandbox = args[0].As<Object>();
 
   Maybe<bool> result =
@@ -1088,21 +1086,21 @@ class ContextifyScript : public BaseObject {
         PersistentToLocal(env->isolate(), wrapped_script->script_);
     Local<Script> script = unbound_script->BindToCurrentContext();
 
-    Local<Value> result;
+    MaybeLocal<Value> result;
     bool timed_out = false;
     bool received_signal = false;
     if (break_on_sigint && timeout != -1) {
       Watchdog wd(env->isolate(), timeout, &timed_out);
       SigintWatchdog swd(env->isolate(), &received_signal);
-      result = script->Run();
+      result = script->Run(env->context());
     } else if (break_on_sigint) {
       SigintWatchdog swd(env->isolate(), &received_signal);
-      result = script->Run();
+      result = script->Run(env->context());
     } else if (timeout != -1) {
       Watchdog wd(env->isolate(), timeout, &timed_out);
-      result = script->Run();
+      result = script->Run(env->context());
     } else {
-      result = script->Run();
+      result = script->Run(env->context());
     }
 
     if (timed_out || received_signal) {
@@ -1133,7 +1131,7 @@ class ContextifyScript : public BaseObject {
       return false;
     }
 
-    args.GetReturnValue().Set(result);
+    args.GetReturnValue().Set(result.ToLocalChecked());
     return true;
   }
 
@@ -1145,9 +1143,9 @@ class ContextifyScript : public BaseObject {
 };
 
 
-void InitContextify(Local<Object> target,
-                    Local<Value> unused,
-                    Local<Context> context) {
+void Initialize(Local<Object> target,
+                Local<Value> unused,
+                Local<Context> context) {
   Environment* env = Environment::GetCurrent(context);
   ContextifyContext::Init(env, target);
   ContextifyScript::Init(env, target);
@@ -1156,4 +1154,4 @@ void InitContextify(Local<Object> target,
 }  // namespace contextify
 }  // namespace node
 
-NODE_BUILTIN_MODULE_CONTEXT_AWARE(contextify, node::contextify::InitContextify)
+NODE_BUILTIN_MODULE_CONTEXT_AWARE(contextify, node::contextify::Initialize)

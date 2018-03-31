@@ -656,6 +656,54 @@ assert.strictEqual(aliceSecret.toString('hex'), bobSecret.toString('hex'));
 // OK
 ```
 
+### ECDH.convertKey(key, curve[, inputEncoding[, outputEncoding[, format]]])
+<!-- YAML
+added: REPLACEME
+-->
+
+- `key` {string | Buffer | TypedArray | DataView}
+- `curve` {string}
+- `inputEncoding` {string}
+- `outputEncoding` {string}
+- `format` {string} Defaults to `uncompressed`.
+
+Converts the EC Diffie-Hellman public key specified by `key` and `curve` to the
+format specified by `format`. The `format` argument specifies point encoding
+and can be `'compressed'`, `'uncompressed'` or `'hybrid'`. The supplied key is
+interpreted using the specified `inputEncoding`, and the returned key is encoded
+using the specified `outputEncoding`. Encodings can be `'latin1'`, `'hex'`,
+or `'base64'`.
+
+Use [`crypto.getCurves()`][] to obtain a list of available curve names.
+On recent OpenSSL releases, `openssl ecparam -list_curves` will also display
+the name and description of each available elliptic curve.
+
+If `format` is not specified the point will be returned in `'uncompressed'`
+format.
+
+If the `inputEncoding` is not provided, `key` is expected to be a [`Buffer`][],
+`TypedArray`, or `DataView`.
+
+Example (uncompressing a key):
+
+```js
+const { ECDH } = require('crypto');
+
+const ecdh = ECDH('secp256k1');
+ecdh.generateKeys();
+
+const compressedKey = ecdh.getPublicKey('hex', 'compressed');
+
+const uncompressedKey = ECDH.convertKey(compressedKey,
+                                        'secp256k1',
+                                        'hex',
+                                        'hex',
+                                        'uncompressed');
+
+// the converted key and the uncompressed public key should be the same
+console.log(uncompressedKey === ecdh.getPublicKey('hex'));
+```
+
 ### ecdh.computeSecret(otherPublicKey[, inputEncoding][, outputEncoding])
 <!-- YAML
 added: v0.11.14
@@ -1254,7 +1302,11 @@ This property is deprecated. Please use `crypto.setFips()` and
 ### crypto.createCipher(algorithm, password[, options])
 <!-- YAML
 added: v0.1.94
+deprecated: REPLACEME
 -->
+
+> Stability: 0 - Deprecated: Use [`crypto.createCipheriv()`][] instead.
+
 - `algorithm` {string}
 - `password` {string | Buffer | TypedArray | DataView}
 - `options` {Object} [`stream.transform` options][]
@@ -1290,7 +1342,7 @@ Adversaries][] for details.
 <!-- YAML
 added: v0.1.94
 changes:
-  - version: REPLACEME
+  - version: v9.9.0
     pr-url: https://github.com/nodejs/node/pull/18644
     description: The `iv` parameter may now be `null` for ciphers which do not
                  need an initialization vector.
@@ -1334,7 +1386,11 @@ called.
 ### crypto.createDecipher(algorithm, password[, options])
 <!-- YAML
 added: v0.1.94
+deprecated: REPLACEME
 -->
+
+> Stability: 0 - Deprecated: Use [`crypto.createDecipheriv()`][] instead.
+
 - `algorithm` {string}
 - `password` {string | Buffer | TypedArray | DataView}
 - `options` {Object} [`stream.transform` options][]
@@ -1358,7 +1414,7 @@ to create the `Decipher` object.
 <!-- YAML
 added: v0.1.94
 changes:
-  - version: REPLACEME
+  - version: v9.9.0
     pr-url: https://github.com/nodejs/node/pull/18644
     description: The `iv` parameter may now be `null` for ciphers which do not
                  need an initialization vector.
@@ -2354,10 +2410,6 @@ the `crypto`, `tls`, and `https` modules and are generally specific to OpenSSL.
   </tr>
   <tr>
     <td><code>DH_NOT_SUITABLE_GENERATOR</code></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><code>NPN_ENABLED</code></td>
     <td></td>
   </tr>
   <tr>

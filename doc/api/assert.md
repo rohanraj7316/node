@@ -15,12 +15,12 @@ For more information about the used equality comparisons see
 
 ## Strict mode
 <!-- YAML
-added: REPLACEME
+added: v9.9.0
 changes:
-  - version: REPLACEME
+  - version: v9.9.0
     pr-url: https://github.com/nodejs/node/pull/17615
     description: Added error diffs to the strict mode
-  - version: REPLACEME
+  - version: v9.9.0
     pr-url: https://github.com/nodejs/node/pull/17002
     description: Added strict mode to the assert module.
 -->
@@ -73,8 +73,8 @@ Please note that this will also deactivate the colors in the REPL.
 > Stability: 0 - Deprecated: Use strict mode instead.
 
 When accessing `assert` directly instead of using the `strict` property, the
-[Abstract Equality Comparison][] will be used for any function without a
-"strict" in its name (e.g. [`assert.deepEqual()`][]).
+[Abstract Equality Comparison][] will be used for any function without "strict"
+in its name, such as [`assert.deepEqual()`][].
 
 It can be accessed using:
 
@@ -83,11 +83,9 @@ const assert = require('assert');
 ```
 
 It is recommended to use the [`strict mode`][] instead as the
-[Abstract Equality Comparison][] can often have surprising results. Especially
-in case of [`assert.deepEqual()`][] as the used comparison rules there are very
-lax.
-
-E.g.
+[Abstract Equality Comparison][] can often have surprising results. This is
+especially true for [`assert.deepEqual()`][], where the comparison rules are
+lax:
 
 ```js
 // WARNING: This does not throw an AssertionError!
@@ -321,10 +319,16 @@ added: REPLACEME
 * `message` {any}
 
 Awaits for the promise returned by function `block` to complete and not be
-rejected. See [`assert.rejects()`][] for more details.
+rejected.
+
+Please note: Using `assert.doesNotReject()` is actually not useful because there
+is little benefit by catching a rejection and then rejecting it again. Instead,
+consider adding a comment next to the specific code path that should not reject
+and keep error messages as expressive as possible.
 
 When `assert.doesNotReject()` is called, it will immediately call the `block`
-function, and awaits for completion.
+function, and awaits for completion. See [`assert.rejects()`][] for more
+details.
 
 Besides the async nature to await the completion behaves identically to
 [`assert.doesNotThrow()`][].
@@ -924,7 +928,7 @@ instead of the `AssertionError`.
 <!-- YAML
 added: v0.1.21
 changes:
-  - version: REPLACEME
+  - version: v9.9.0
     pr-url: https://github.com/nodejs/node/pull/17584
     description: The `error` parameter can now be an object as well.
   - version: v4.2.0
